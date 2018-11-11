@@ -1,0 +1,7 @@
+C:\Card_GeneticAlgorithm\Card_GeneticAlgorithm\bin\Debug\Card_GeneticAlgorithm.exe.config
+C:\Card_GeneticAlgorithm\Card_GeneticAlgorithm\bin\Debug\Card_GeneticAlgorithm.exe
+C:\Card_GeneticAlgorithm\Card_GeneticAlgorithm\bin\Debug\Card_GeneticAlgorithm.pdb
+C:\Card_GeneticAlgorithm\Card_GeneticAlgorithm\obj\Debug\Card_GeneticAlgorithm.csprojAssemblyReference.cache
+C:\Card_GeneticAlgorithm\Card_GeneticAlgorithm\obj\Debug\Card_GeneticAlgorithm.csproj.CoreCompileInputs.cache
+C:\Card_GeneticAlgorithm\Card_GeneticAlgorithm\obj\Debug\Card_GeneticAlgorithm.exe
+C:\Card_GeneticAlgorithm\Card_GeneticAlgorithm\obj\Debug\Card_GeneticAlgorithm.pdb
