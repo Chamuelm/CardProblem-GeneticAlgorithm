@@ -6,72 +6,66 @@ namespace Card_GeneticAlgorithm
 {
     public class CardGA
     {
-        int[] CARDS = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-        private int POP = 30; //population size
-        private int LEN = 5; //geneotype
+        int[] CARDS = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }; // Available cards
+        private int POP = 30; // Population size, default is 30
+        private int LEN = 5; // Num of genes
         private int WINSCORE = 42; // Minimum score of individual for win
-        private double MUT = 0.1; //mutation rate
-        private double END = 1000; //how many tournaments should be played
+        private double MUT = 0.1; // Mutation rate
+        private double END = 1000; // How many tournaments should be played
 
-        //the sum pile, end result for the SUM pile
-        //card1 + card2 + card3 + card4 + card5, MUST = 36 for a good GA
-        private int SUMTARG = 36;
+        private int SUMTARG = 36; // Target result for the sum pile
         private int MAX_DIFF_FROM_SUM = 21; // 36 - (1+2+3+4+5)
-
-        //the product pile, end result for the PRODUCT pile
-        //card1 * card2 * card3 * card4 * card5, MUST = 360 for a good GA
-        private int PRODTARG = 360;
+        private int PRODTARG = 360; // Target result for the prod pile
         private int MAX_DIFF_FROM_PROD = 29880; // (10*9*8*7*6*5)-360
         private double DIV_FACTOR = 29880 / 21; // MAX_DIFF_FROM_PROD / MAX_DIFF_FROM_SUM, to get balanced weights
 
 
-        private int[,] gene; //the genes array
-        private int[,] geneCombined; // Temp matrix
-        private int[] eval; //Current generation evaluation
+        private int[,] gene; // The genes matrix
+        private int[,] geneCombined; // Temp matrix for creating next generation
+        private int[] eval; // Current generation evaluation
 
-        //used to create randomness (Simulates selection process in nature)
-        //randomly selects genes
-        Random rnd = new Random();
+        Random rnd = new Random();  //used to create randomness
 
         // Constructor, create population data structures and initialize it
         public CardGA(int pop)
         {
             this.POP = pop;
             gene = new int[POP, LEN];
-            init_pop(); //initialise the population (randomly)
             eval = new int[POP];
 
+            init_pop(); // Initialise the population (randomly)
             geneCombined = new int[POP, LEN]; // Init temp matrix
         }
 
-        //Runs the GA to solve the problem domain
-        //Where the problem domain is specified as follows
+        // Runs the GA to solve the problem domain
+        // Where the problem domain is specified as follows
         //
-        //You have 10 cards numbered 1 to 10.
-        //You have to divide them into 2 even piles so that:
+        // You have 10 cards numbered 1 to 10.
+        // You have to divide them into 2 even piles so that:
         //
-        //The sum of the first pile is as close as possible to 36
-        //And the product of all in second pile is as close as poss to 360
+        // The sum of the first pile is as close as possible to 36
+        // And the product of all in second pile is as close as poss to 360
         //
-        //Each individual is charcterized by 5 cards numbers which are the product members
-        //The rest of the cards are the sum members
+        // Each individual is charcterized by 5 cards numbers which are the product members
+        // The rest of the cards are the sum members
         public void run()
         {
-            int a, b; //declare pop member a,b
+            int a, b; // Declare pop member a,b
             bool foundWin = false;
             int splitLocation;
 
-            //start a tournament
+            // Start a tournament
             for (int tournamentNo = 0; (tournamentNo < END) && !foundWin; tournamentNo++)
             {
                 // Display
                 Console.WriteLine("==============================");
                 Console.WriteLine("========== Round {0,2} ==========", tournamentNo);
 
-                //Calculate evaluation for current generation population
+                // Calculate evaluation for current generation population
                 evaluateGeneration();
                 displayCurrentPopulation();
                 Console.WriteLine("");
+                // Check for win result
                 for (int i = 0; i < POP; i++)
                 {
                     if (eval[i] >= WINSCORE)
@@ -105,7 +99,7 @@ namespace Card_GeneticAlgorithm
                     // Recombine a and b
                     recombine(a, b, splitLocation, i);
 
-                    // Maybe do some muttion
+                    // Maybe do some mutation
                     if (rnd.NextDouble() < MUT)
                     {
                         mutate(i);
@@ -127,11 +121,12 @@ namespace Card_GeneticAlgorithm
                     Console.WriteLine("*****************************************", i);
                 }
 
+                // After finished creating all new generation copy them to main matrix
                 copyCombined();
-
-                int maxValue = 0, maxIndex = 0;
+                
                 if (tournamentNo == 999)
                 {
+                    int maxValue = 0, maxIndex = 0;
                     for (int i = 0; i < POP; i++)
                     {
                         if (eval[i] > maxValue)
@@ -140,13 +135,12 @@ namespace Card_GeneticAlgorithm
                             maxIndex = i;
                         }
                     }
-
                     display(tournamentNo, maxIndex);
                 }
             }
         }
 
-
+        // Evaluate score for each individual in main matrix
         private void evaluateGeneration()
         {
             for (int i = 0; i < POP; i++)
@@ -155,6 +149,7 @@ namespace Card_GeneticAlgorithm
             }
         }
 
+        // Returns weighted random individual from main matrix
         private int getRandomIndividual()
         {
             int sumOfWeights = 0;
@@ -176,6 +171,8 @@ namespace Card_GeneticAlgorithm
             throw new IndexOutOfRangeException("Cannot find chosen element");
         }
 
+        // Recombine 2 individuals a,b from main matrix and save result in recombineGene
+        // with given index popIndex and given splitLocation
         private void recombine(int a, int b, int splitLocation, int popIndex)
         {
             int i;
@@ -201,12 +198,12 @@ namespace Card_GeneticAlgorithm
             for (i = splitLocation; i < LEN; i++)
             {
                 if (possible.Contains(gene[b, i]))
-                {
+                {   // If not repeated number
                     geneCombined[popIndex, i] = gene[b, i];
                     possible.Remove(gene[b, i]);
                 }
                 else
-                {
+                {   // Take from first part of b id card i is repeated
                     int bIndex = rnd.Next(bPossible.Count);
                     geneCombined[popIndex, i] = bPossible[bIndex];
                     bPossible.RemoveAt(bIndex);
@@ -250,6 +247,7 @@ namespace Card_GeneticAlgorithm
             }
         }
 
+        // Display population of current generation
         private void displayCurrentPopulation()
         {
             for (int i = 0; i < POP; i++)
@@ -258,11 +256,14 @@ namespace Card_GeneticAlgorithm
             }
         }
 
+
+        // Display individual i from current main matrix
         private void displayIndividual(int i)
         {
             displayIndividual(i, gene);
         }
 
+        // Display individual i from given matrix
         private void displayIndividual(int i, int[,] matrix)
         {
             List<int> possible = new List<int>(CARDS);
@@ -352,6 +353,7 @@ namespace Card_GeneticAlgorithm
             }
         }
 
+        // Copy combined matrix to main matrix
         private void copyCombined()
         {
             for (int i = 0; i < POP; i++)
